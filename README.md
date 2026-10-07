@@ -4,9 +4,7 @@
 
 It works in Claude, Claude Code, Codex, ChatGPT, Cursor and other tools that read the open [Agent Skills](https://agentskills.io) format.
 
-<video src="docs/ste100-explainer.mp4" controls muted playsinline preload="metadata" width="100%"></video>
 
-If the video does not play, open [`docs/ste100-explainer.mp4`](docs/ste100-explainer.mp4).
 
 ## Why
 
