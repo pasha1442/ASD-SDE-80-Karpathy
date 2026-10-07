@@ -1,0 +1,16 @@
+{
+  "name": "ste-explain-skill",
+  "description": "STE Explain: clear AI answers in 80% ASD-STE100",
+  "owner": {
+    "name": "Akash Parashar"
+  },
+  "plugins": [
+    {
+      "name": "ste-explain",
+      "source": "./",
+      "description": "Clear answers in 80% ASD-STE100 Simplified Technical English, with diagram, page and video modes and a checker for lost facts.",
+      "version": "1.1.0",
+      "category": "productivity"
+    }
+  ]
+}

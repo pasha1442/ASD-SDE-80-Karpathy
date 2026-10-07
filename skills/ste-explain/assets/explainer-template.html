@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>REPLACE: short name of the topic</title>
+<style>
+  /* Template for page mode. Replace the content. Keep the tokens, the Assumptions section and one real control. */
+  :root {
+    --bg: #f3f5f7; --surface: #ffffff; --ink: #16222c; --muted: #5a6875; --line: #c9d2da;
+    --accent: #0b5cad; --good: #17694b; --bad: #a8261d;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+    --mono: ui-monospace, Menlo, Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #0f1820; --surface: #17232e; --ink: #e6edf2; --muted: #9aaab8; --line: #2f404e;
+            --accent: #74b6f2; --good: #62d1a4; --bad: #f39088; color-scheme: dark; }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; padding: 2rem 1rem 4rem; background: var(--bg); color: var(--ink);
+         font: 1.0625rem/1.6 var(--sans); }
+  main { max-width: 44rem; margin: 0 auto; }
+  h1 { font-size: clamp(1.9rem, 6vw, 2.8rem); line-height: 1.1; margin: 0 0 .6rem; text-wrap: balance; }
+  h2 { font-size: 1.35rem; margin: 2.5rem 0 .5rem; }
+  p { margin: .7rem 0 0; }
+  .answer { font-size: 1.2rem; }
+  .panel { background: var(--surface); border: 1px solid var(--line); padding: 1.25rem; margin-top: 1.5rem; }
+  label { display: block; font-weight: 600; }
+  input[type=range] { width: 100%; margin-top: .5rem; accent-color: var(--accent); }
+  output { font: 600 1.6rem var(--mono); font-variant-numeric: tabular-nums; }
+  .track { height: 1.1rem; background: var(--bg); border: 1px solid var(--line); margin-top: .8rem; }
+  .fill { height: 100%; background: var(--good); transition: width .3s ease; }
+  .fill.over { background: var(--bad); }
+  ul, ol { padding-left: 1.2rem; }
+  .diagram { background: var(--surface); border: 1px solid var(--line); padding: .75rem; margin-top: 1.5rem; }
+  .diagram svg { display: block; width: 100%; height: auto; }
+  .diagram .box { fill: var(--bg); stroke: var(--line); stroke-width: 2; }
+  .diagram .box.on { stroke: var(--accent); }
+  .diagram .label { fill: var(--ink); font: 600 15px var(--sans); text-anchor: middle; }
+  .diagram .edge { stroke: var(--muted); stroke-width: 2; fill: none; }
+  .diagram .tag { fill: var(--muted); font: 13px var(--sans); text-anchor: middle; }
+  .dot-hit { fill: var(--good); }
+  .dot-miss { fill: var(--accent); }
+  .legend { display: flex; flex-wrap: wrap; gap: .4rem 1.2rem; margin: .6rem 0 0; font-size: .9rem; color: var(--muted); }
+  .legend i { display: inline-block; width: .8rem; height: .8rem; border-radius: 50%; margin-right: .35rem; vertical-align: -1px; }
+  .btn { font: inherit; font-weight: 600; padding: .4rem .9rem; margin-top: .7rem; background: var(--surface);
+         color: var(--ink); border: 1px solid var(--line); cursor: pointer; }
+  .btn:hover { border-color: var(--accent); }
+  .sources li { margin: .5rem 0; }
+  .sources a { color: var(--accent); overflow-wrap: anywhere; }
+  .sources small { display: block; color: var(--muted); }
+  :focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+  footer { margin-top: 3rem; font-size: .9rem; color: var(--muted); }
+  @media (prefers-reduced-motion: reduce) { .fill { transition: none; } }
+</style>
+</head>
+<body>
+<main>
+  <h1>REPLACE: the question</h1>
+  <p class="answer">REPLACE: the answer in one or two short sentences.</p>
+
+  <!-- The control: the reader changes one assumption and sees the result. -->
+  <section class="panel" aria-labelledby="try">
+    <h2 id="try" style="margin-top:0">Change the value</h2>
+    <label for="value">Cache time in seconds</label>
+    <input type="range" id="value" min="0" max="600" step="10" value="60">
+    <p>Requests that reach the server in one hour: <output id="result" for="value">60</output></p>
+    <div class="track"><div class="fill" id="bar"></div></div>
+    <p id="note" style="color:var(--muted)"></p>
+  </section>
+
+  <!-- The animated diagram. Each dot is one request. Replace the labels and the path with your own mechanism. -->
+  <section class="diagram" aria-labelledby="flow">
+    <h2 id="flow" style="margin:.2rem 0 .4rem">Watch the requests</h2>
+    <svg viewBox="0 0 640 170" role="img" aria-labelledby="flow-title flow-desc">
+      <title id="flow-title">Requests travel from the client to the cache and sometimes to the server</title>
+      <desc id="flow-desc">Each dot is a request. A green dot is answered by the cache. A blue dot goes on to the server.</desc>
+      <path class="edge" d="M110 85 H270"/>
+      <path class="edge" d="M370 85 H530"/>
+      <rect class="box" x="20" y="55" width="90" height="60" rx="6"/><text class="label" x="65" y="90">Client</text>
+      <rect class="box on" id="cache-box" x="270" y="55" width="100" height="60" rx="6"/><text class="label" x="320" y="90">Cache</text>
+      <rect class="box" x="530" y="55" width="90" height="60" rx="6"/><text class="label" x="575" y="90">Server</text>
+      <text class="tag" x="190" y="72">sends</text>
+      <text class="tag" x="450" y="72">asks</text>
+      <g id="dots"></g>
+    </svg>
+    <p class="legend" aria-hidden="true"><span><i style="background:var(--good)"></i>The cache answers</span><span><i style="background:var(--accent)"></i>The request reaches the server</span></p>
+    <button class="btn" id="toggle" type="button" aria-pressed="false">Pause</button>
+  </section>
+
+  <h2>How it works</h2>
+  <p>REPLACE: explain the mechanism in STE. Use short sentences. Use one name for each thing.</p>
+
+  <h2>Assumptions</h2>
+  <ul>
+    <li>REPLACE: each simplification that the model on this page makes.</li>
+    <li>Example: one client sends one request each second.</li>
+  </ul>
+
+  <h2>Sources</h2>
+  <!-- One item for each page that you opened during research. Copy each URL exactly. Never add a link that you did not open. -->
+  <ol class="sources">
+    <li><a href="https://example.com/REPLACE" target="_blank" rel="noopener noreferrer">REPLACE: title of the page</a>
+      <small>REPLACE: site name, date of the page (if shown), date that you read it. Supports: the claim in this page.</small></li>
+  </ol>
+  <p style="color:var(--muted)">A link shows where a claim came from. It does not prove that the claim is true. Open the source and check the key facts.</p>
+
+  <footer>This page shows a model of the subject. It does not test your system.</footer>
+</main>
+<script>
+  // REPLACE this model with the real relation for your topic. Keep it small and visible.
+  const input = document.getElementById('value');
+  const result = document.getElementById('result');
+  const bar = document.getElementById('bar');
+  const note = document.getElementById('note');
+  const REQUESTS_PER_HOUR = 3600;           // assumption: one request each second
+  let missRate = 1;                          // share of requests that reach the server
+  function update() {
+    const cache = Number(input.value);
+    const reach = cache === 0 ? REQUESTS_PER_HOUR : Math.ceil(3600 / cache);
+    missRate = reach / REQUESTS_PER_HOUR;
+    result.textContent = reach.toLocaleString();
+    bar.style.width = (reach / REQUESTS_PER_HOUR * 100) + '%';
+    bar.classList.toggle('over', reach > 600);
+    note.textContent = cache === 0
+      ? 'With no cache, each request reaches the server.'
+      : 'The cache answers the other ' + (REQUESTS_PER_HOUR - reach).toLocaleString() + ' requests.';
+  }
+
+  // Animation: one dot is one request. The dot follows the path. At the cache it either turns back (hit) or goes on (miss).
+  // The share of misses comes from the same value as the bar, so the diagram and the number always agree.
+  const NS = 'http://www.w3.org/2000/svg';
+  const dots = document.getElementById('dots');
+  const cacheBox = document.getElementById('cache-box');
+  const toggle = document.getElementById('toggle');
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)');
+  const SPEED = 140;                         // pixels in each second
+  const SPAWN_EVERY = 0.45;                  // seconds between two requests
+  let running = !reduce.matches, last = 0, sinceSpawn = 0, missDebt = 0;
+  const flying = [];
+
+  function spawn() {
+    missDebt += missRate;                    // spreads the misses evenly, with no random numbers
+    const miss = missDebt >= 1;
+    if (miss) missDebt -= 1;
+    const el = document.createElementNS(NS, 'circle');
+    el.setAttribute('r', 7); el.setAttribute('cy', 85); el.setAttribute('cx', 110);
+    el.setAttribute('class', miss ? 'dot-miss' : 'dot-hit');
+    dots.appendChild(el);
+    flying.push({ el, x: 110, miss });
+  }
+  function frame(t) {
+    const dt = Math.min((t - last) / 1000, 0.1); last = t;
+    if (running) {
+      sinceSpawn += dt;
+      if (sinceSpawn >= SPAWN_EVERY) { sinceSpawn = 0; spawn(); }
+      for (let i = flying.length - 1; i >= 0; i--) {
+        const d = flying[i];
+        const stop = d.miss ? 575 : 320;     // a hit ends at the cache, a miss ends at the server
+        d.x += SPEED * dt;
+        if (d.x >= stop) { d.el.remove(); flying.splice(i, 1); cacheBox.classList.add('on'); continue; }
+        d.el.setAttribute('cx', d.x);
+      }
+    }
+    requestAnimationFrame(frame);
+  }
+  function setRunning(on) {
+    running = on;
+    toggle.textContent = on ? 'Pause' : 'Play';
+    toggle.setAttribute('aria-pressed', String(!on));
+  }
+  toggle.addEventListener('click', () => setRunning(!running));
+  reduce.addEventListener('change', e => setRunning(!e.matches));
+  setRunning(running);
+  requestAnimationFrame(t => { last = t; frame(t); });
+  input.addEventListener('input', update);
+  update();
+</script>
+</body>
+</html>

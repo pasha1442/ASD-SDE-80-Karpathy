@@ -1,0 +1,5 @@
+interface:
+  display_name: "STE Explain"
+  short_description: "Clear answers in 80% ASD-STE100, plus diagram, page and video modes"
+policy:
+  allow_implicit_invocation: true

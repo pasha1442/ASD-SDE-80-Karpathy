@@ -1,0 +1,6 @@
+media/
+__pycache__/
+*.pyc
+.DS_Store
+node_modules/
+/ste100-explainer.mp4

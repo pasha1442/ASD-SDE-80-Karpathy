@@ -1,0 +1,591 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>STE100 Prompting Guide</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Barlow+Condensed:wght@500;600;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: one reading column (max 44rem) on cool manual paper; figures and tools break out to 60rem.
+   Conventions borrowed from maintenance manuals: placard headings, WARNING / CAUTION / NOTE blocks. */
+:root{
+  --bg:#eef2f5; --surface:#ffffff; --sunk:#e3e9ee; --ink:#14212b; --muted:#566573; --line:#c5d0d9;
+  --blue:#0b5cad; --blue-soft:#dbe9f7; --amber:#9a5b00; --amber-soft:#fbecd0;
+  --ok:#17694b; --ok-soft:#d9f0e6; --bad:#a8261d; --bad-soft:#f9dedb;
+  --display:"Barlow Condensed","Arial Narrow",Arial,sans-serif;
+  --body:"Atkinson Hyperlegible",Verdana,"Segoe UI",sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#0f1820; --surface:#17232e; --sunk:#111c25; --ink:#e6edf2; --muted:#9aaab8; --line:#2f404e;
+  --blue:#74b6f2; --blue-soft:#17344f; --amber:#f0b34a; --amber-soft:#3a2c10;
+  --ok:#62d1a4; --ok-soft:#123528; --bad:#f39088; --bad-soft:#40191a; color-scheme:dark } }
+:root[data-theme="dark"]{
+  --bg:#0f1820; --surface:#17232e; --sunk:#111c25; --ink:#e6edf2; --muted:#9aaab8; --line:#2f404e;
+  --blue:#74b6f2; --blue-soft:#17344f; --amber:#f0b34a; --amber-soft:#3a2c10;
+  --ok:#62d1a4; --ok-soft:#123528; --bad:#f39088; --bad-soft:#40191a; color-scheme:dark }
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:1.0625rem;line-height:1.6;padding-inline:1rem;padding-block:0 4rem}
+.col{max-width:44rem;margin-inline:auto}
+.wide{max-width:60rem;margin-inline:auto}
+h1,h2,h3{font-family:var(--display);line-height:1.08;text-wrap:balance;margin:0;letter-spacing:.005em}
+h1{font-size:clamp(2.6rem,8vw,4.4rem);font-weight:700;text-transform:uppercase}
+h2{font-size:clamp(1.8rem,5vw,2.4rem);font-weight:600;text-transform:uppercase;margin-top:4rem;padding-top:1rem;border-top:2px solid var(--ink)}
+h3{font-size:1.35rem;font-weight:600;margin-top:1.75rem}
+p{margin:.9rem 0 0}
+a{color:var(--blue)}
+code,.mono{font-family:var(--mono);font-size:.9em}
+:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+.eyebrow{font-family:var(--mono);font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+
+header.top{padding-block:3rem 1.5rem}
+.lede{font-size:1.25rem;margin-top:1.1rem;max-width:36rem}
+.plate{display:flex;flex-wrap:wrap;gap:0;margin-top:2rem;border:1px solid var(--line);background:var(--surface)}
+.plate div{flex:1 1 8.5rem;padding:.7rem .9rem;border-right:1px solid var(--line);border-bottom:1px solid var(--line);margin:0 -1px -1px 0}
+.plate b{display:block;font-family:var(--display);font-size:1.7rem;font-weight:600;line-height:1.1;font-variant-numeric:tabular-nums}
+.plate span{font-size:.85rem;color:var(--muted)}
+nav.toc{display:flex;flex-wrap:wrap;gap:.4rem 1.1rem;margin-top:1.6rem;font-size:.95rem}
+
+.panel{background:var(--surface);border:1px solid var(--line);padding:1.25rem;margin-top:1.5rem}
+figure{margin:1.5rem 0 0}
+figcaption{font-size:.9rem;color:var(--muted);margin-top:.6rem}
+.scroll{overflow-x:auto}
+svg{display:block;max-width:100%;height:auto}
+svg text{font-family:var(--body);fill:currentColor}
+
+/* manual-style notice blocks */
+.notice{margin-top:1.5rem;border:2px solid var(--amber);background:var(--amber-soft)}
+.notice>b{display:inline-block;background:var(--amber);color:var(--surface);font-family:var(--display);font-size:1.05rem;letter-spacing:.1em;padding:.1rem .7rem}
+.notice>div{padding:.6rem .9rem .9rem}
+.notice p:first-child{margin-top:0}
+.notice.note{border-color:var(--blue);background:var(--blue-soft)}
+.notice.note>b{background:var(--blue)}
+
+button,.seg label{font:inherit;cursor:pointer}
+.btn{border:1.5px solid var(--ink);background:var(--surface);color:var(--ink);padding:.45rem .95rem;font-family:var(--display);font-size:1.1rem;font-weight:600;letter-spacing:.04em;text-transform:uppercase}
+.btn:hover{background:var(--ink);color:var(--surface)}
+.btn.primary{background:var(--blue);border-color:var(--blue);color:var(--surface)}
+.btn.primary:hover{filter:brightness(1.12);background:var(--blue);color:var(--surface)}
+.btn:disabled{opacity:.4;cursor:default;background:var(--surface);color:var(--ink)}
+.row{display:flex;flex-wrap:wrap;gap:.6rem;align-items:center}
+
+/* rewriter */
+.steps{display:flex;gap:.3rem;flex-wrap:wrap}
+.steps button{flex:1 1 2.2rem;min-width:2.2rem;height:.55rem;border:1px solid var(--line);background:var(--sunk);padding:0}
+.steps button[aria-current="true"]{background:var(--blue);border-color:var(--blue)}
+.steps button.done{background:var(--ink);border-color:var(--ink)}
+.stage-text{font-family:var(--mono);font-size:.98rem;line-height:1.75;background:var(--sunk);padding:1rem;margin-top:1rem;min-height:9.5rem}
+mark{background:var(--ok-soft);color:var(--ok);padding:.05em .15em;font-weight:600}
+del{background:var(--bad-soft);color:var(--bad);text-decoration-thickness:1.5px;padding:.05em .15em}
+.bars{margin-top:1rem;display:grid;gap:.45rem}
+.bar{display:grid;grid-template-columns:5.2rem 1fr;gap:.6rem;align-items:center;font-size:.85rem;font-variant-numeric:tabular-nums}
+.track{position:relative;height:1.05rem;background:var(--sunk);border:1px solid var(--line)}
+.fill{position:absolute;inset:0 auto 0 0;background:var(--ok);transition:width .45s ease}
+.fill.over{background:var(--bad)}
+.limit{position:absolute;top:-.3rem;bottom:-.3rem;width:2px;background:var(--ink)}
+.limit-label{font-size:.8rem;color:var(--muted);margin-top:.35rem}
+@media (prefers-reduced-motion:reduce){.fill{transition:none}}
+
+/* rules explorer */
+.tabs{display:flex;flex-wrap:wrap;gap:.35rem}
+.tabs button{border:1px solid var(--line);background:var(--sunk);color:var(--ink);padding:.35rem .7rem;font-size:.92rem}
+.tabs button[aria-selected="true"]{background:var(--ink);color:var(--surface);border-color:var(--ink)}
+.pair{display:grid;grid-template-columns:repeat(auto-fit,minmax(15rem,1fr));gap:.8rem;margin-top:1rem}
+.pair>div{min-width:0;padding:.8rem;border:1px solid var(--line)}
+.pair .tag{font-family:var(--display);font-weight:600;letter-spacing:.08em;text-transform:uppercase;font-size:1rem}
+.pair .no .tag{color:var(--bad)} .pair .yes .tag{color:var(--ok)}
+.pair p{font-family:var(--mono);font-size:.92rem;margin-top:.4rem}
+
+table{border-collapse:collapse;width:100%;font-size:.95rem}
+th,td{text-align:left;padding:.5rem .6rem;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-family:var(--display);font-size:1.05rem;font-weight:600;letter-spacing:.05em;text-transform:uppercase}
+td.n{font-variant-numeric:tabular-nums;font-weight:700;white-space:nowrap}
+
+/* tree */
+.tree{display:grid;grid-template-columns:repeat(auto-fit,minmax(15rem,1fr));gap:1rem;margin-top:1rem}
+.tree>div{min-width:0;border:1px solid var(--line);padding:.9rem}
+.tree ol,.tree ul{margin:.5rem 0 0;padding-left:1.3rem}
+.tree li{margin:.15rem 0}
+.root{border:2px solid var(--ink);padding:.6rem .9rem;font-family:var(--display);font-size:1.3rem;font-weight:600;text-transform:uppercase;text-align:center}
+
+/* timeline */
+.time{display:grid;grid-template-columns:repeat(auto-fit,minmax(7.2rem,1fr));gap:.8rem;margin:1rem 0 0;padding:0;list-style:none}
+.time li{border-top:3px solid var(--ink);padding-top:.5rem;font-size:.92rem}
+.time b{display:block;font-family:var(--display);font-size:1.6rem;font-weight:600;line-height:1}
+
+/* checker */
+textarea{width:100%;min-height:9rem;font-family:var(--mono);font-size:.95rem;line-height:1.6;padding:.8rem;background:var(--sunk);color:var(--ink);border:1px solid var(--line);resize:vertical}
+.seg{display:inline-flex;border:1.5px solid var(--ink)}
+.seg input{position:absolute;opacity:0;pointer-events:none}
+.seg label{padding:.35rem .8rem;font-size:.92rem}
+.seg input:checked+label{background:var(--ink);color:var(--surface)}
+.seg input:focus-visible+label{outline:3px solid var(--blue);outline-offset:2px}
+.sent{border-top:1px solid var(--line);padding:.7rem 0}
+.sent p{margin:0 0 .45rem;font-size:.98rem}
+.hit{background:var(--amber-soft);color:var(--amber);font-weight:700;padding:0 .12em}
+.chips{display:flex;flex-wrap:wrap;gap:.3rem;margin-top:.45rem}
+.chip{font-size:.8rem;padding:.1rem .5rem;border:1px solid var(--amber);color:var(--amber);background:var(--amber-soft)}
+.chip.ok{border-color:var(--ok);color:var(--ok);background:var(--ok-soft)}
+.summary{font-weight:700;margin-top:1rem}
+
+/* chart */
+.chart{display:grid;gap:.7rem;margin-top:1rem}
+.cbar{display:grid;grid-template-columns:minmax(8rem,14rem) 1fr;gap:.7rem;align-items:center;font-size:.92rem}
+.cbar .track{height:1.6rem}
+.cbar .val{position:absolute;top:50%;transform:translateY(-50%);padding-left:.4rem;font-weight:700;font-variant-numeric:tabular-nums}
+
+/* decision flow */
+.crumbs{display:flex;flex-wrap:wrap;gap:.35rem;min-height:1.9rem;margin-bottom:.8rem}
+.crumbs span{font-size:.85rem;border:1px solid var(--line);background:var(--sunk);padding:.15rem .55rem}
+.q{font-family:var(--display);font-size:1.5rem;font-weight:600}
+.opts{display:grid;gap:.5rem;margin-top:.9rem}
+.opts button{text-align:left;border:1px solid var(--line);background:var(--sunk);color:var(--ink);padding:.65rem .8rem}
+.opts button:hover{border-color:var(--blue);background:var(--blue-soft)}
+.verdict{font-family:var(--display);font-size:1.7rem;font-weight:700;text-transform:uppercase}
+.verdict.go{color:var(--ok)} .verdict.stop{color:var(--bad)}
+
+/* recipes */
+.recipe{margin-top:1.2rem;border:1px solid var(--line);background:var(--surface)}
+.recipe header{display:flex;justify-content:space-between;align-items:center;gap:.6rem;padding:.5rem .8rem;border-bottom:1px solid var(--line)}
+.recipe h3{margin:0;font-size:1.2rem}
+.recipe pre{margin:0;padding:.9rem;white-space:pre-wrap;word-break:break-word;font-family:var(--mono);font-size:.92rem;line-height:1.6;background:var(--sunk)}
+.recipe p{margin:0;padding:.6rem .8rem;font-size:.92rem;color:var(--muted)}
+.copy{border:1px solid var(--ink);background:var(--surface);color:var(--ink);font-size:.82rem;padding:.2rem .6rem}
+video{display:block;width:100%;background:#000;border:1px solid var(--line)}
+ul.plain{padding-left:1.2rem;margin:.8rem 0 0}
+ul.plain li{margin:.3rem 0}
+footer{margin-top:4rem;font-size:.9rem;color:var(--muted)}
+</style>
+</head>
+<body>
+
+
+<header class="top col">
+  <div class="eyebrow">Prompt technique · written 80% of the way to ASD-STE100</div>
+  <h1>ASD-STE100 Prompting</h1>
+  <p class="lede">You add one line to your prompt. The model then writes like an aircraft maintenance manual: short sentences, plain words, one idea in each sentence.</p>
+  <div class="plate" aria-label="Key figures of the standard">
+    <div><b>53</b><span>writing rules</span></div>
+    <div><b>≈ 900</b><span>approved words</span></div>
+    <div><b>20 / 25</b><span>maximum words in a sentence</span></div>
+    <div><b>Issue 9</b><span>January 2025</span></div>
+  </div>
+  <nav class="toc" aria-label="Contents">
+    <a href="#what">What it is</a><a href="#video">Animation</a><a href="#rewrite">See a rewrite</a><a href="#rules">The rules</a>
+    <a href="#check">Check your text</a><a href="#eighty">Why 80%</a><a href="#decide">When to use it</a>
+    <a href="#recipes">Prompts</a><a href="#verify">Limits</a>
+  </nav>
+</header>
+
+<main>
+<section class="col" id="what">
+  <h2>What it is</h2>
+  <p>ASD-STE100 is a standard for clear technical English. Its second name is Simplified Technical English (STE). European airlines asked for it in 1979. Many mechanics read English as a second language. A mechanic who reads an instruction incorrectly can cause an accident.</p>
+  <p>ASD-STE100 prompting uses this standard for a new reader: you. AI models write long sentences with filler words. Andrej Karpathy found a simple correction. He tells the model to explain the topic in ASD-STE100. Models know the standard from their training data.</p>
+
+  <ol class="time" aria-label="History of the standard">
+    <li><b>1979</b>Airlines ask for a controlled English for manuals.</li>
+    <li><b>1986</b>The first Simplified English guide is published.</li>
+    <li><b>2005</b>The guide becomes ASD-STE100.</li>
+    <li><b>2013</b>The standard becomes free to download.</li>
+    <li><b>2025</b>Issue 9 becomes an international standard.</li>
+  </ol>
+
+  <h3>The two parts of the standard</h3>
+  <div class="root" style="margin-top:1rem">ASD-STE100</div>
+  <div class="tree">
+    <div>
+      <b>Part 1: Writing rules</b>
+      <ol>
+        <li>Words</li><li>Multi-word nouns</li><li>Verbs</li><li>Sentences</li><li>Procedural writing</li>
+        <li>Descriptive writing</li><li>Safety instructions</li><li>Punctuation and word counts</li><li>Writing practices</li>
+      </ol>
+    </div>
+    <div>
+      <b>Part 2: Dictionary</b>
+      <ul>
+        <li>About 900 approved words.</li>
+        <li>Each approved word has one meaning and one part of speech.</li>
+        <li>About 1,200 words are not approved. Each has an approved alternative.</li>
+        <li>You can add technical nouns and technical verbs for your subject.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="wide" id="video" hidden>
+  <div class="col"><h2>Animation</h2><p>This animation shows the technique in about two minutes. It has no sound.</p></div>
+  <figure><video id="vid" controls muted playsinline preload="metadata"></video>
+  <figcaption>Made with Manim, the open-source animation engine. The style follows mathematical explainer videos.</figcaption></figure>
+</section>
+
+<section class="wide" id="rewrite">
+  <div class="col">
+    <h2>See a rewrite, one rule at a time</h2>
+    <p>The sentence below is typical AI output. Push <b>Next rule</b>. Each step applies one STE rule. The bars show the number of words in each sentence.</p>
+  </div>
+  <div class="panel">
+    <div class="steps" id="stepDots" role="group" aria-label="Rewrite steps"></div>
+    <h3 id="stageTitle" style="margin-top:1rem"></h3>
+    <p id="stageWhy" style="margin-top:.3rem"></p>
+    <div class="stage-text" id="stageText" aria-live="polite"></div>
+    <div class="bars" id="stageBars"></div>
+    <div class="limit-label">The black line is the limit for an instruction: 20 words.</div>
+    <div class="row" style="margin-top:1rem">
+      <button class="btn" id="prevStep">Back</button>
+      <button class="btn primary" id="nextStep">Next rule</button>
+    </div>
+  </div>
+</section>
+
+<section class="wide" id="rules">
+  <div class="col">
+    <h2>The rules</h2>
+    <p>The standard has 53 rules. These nine rules do most of the work in a prompt. Select a rule to see an example.</p>
+  </div>
+  <div class="panel">
+    <div class="tabs" id="ruleTabs" role="tablist" aria-label="Rules"></div>
+    <h3 id="ruleTitle"></h3>
+    <p id="ruleText" style="margin-top:.3rem"></p>
+    <div class="pair">
+      <div class="no"><span class="tag">Do not write</span><p id="ruleNo"></p></div>
+      <div class="yes"><span class="tag">Write</span><p id="ruleYes"></p></div>
+    </div>
+  </div>
+  <div class="col">
+    <h3>The limits</h3>
+    <div class="scroll"><table>
+      <thead><tr><th>Limit</th><th>Applies to</th></tr></thead>
+      <tbody>
+        <tr><td class="n">20 words</td><td>A sentence in a procedure (an instruction).</td></tr>
+        <tr><td class="n">25 words</td><td>A sentence in a description.</td></tr>
+        <tr><td class="n">6 sentences</td><td>A paragraph in a description.</td></tr>
+        <tr><td class="n">3 words</td><td>A multi-word noun, for example "fuel pump valve".</td></tr>
+        <tr><td class="n">1 instruction</td><td>Each sentence, unless two actions occur at the same time.</td></tr>
+      </tbody>
+    </table></div>
+    <h3>Word changes from the dictionary</h3>
+    <div class="scroll"><table>
+      <thead><tr><th>Not approved</th><th>Approved</th></tr></thead>
+      <tbody>
+        <tr><td>commence</td><td>START</td></tr>
+        <tr><td>prior to</td><td>BEFORE</td></tr>
+        <tr><td>ensure</td><td>MAKE SURE</td></tr>
+        <tr><td>utilize</td><td>USE</td></tr>
+        <tr><td>replenish</td><td>FILL</td></tr>
+        <tr><td>close (near)</td><td>NEAR. "Close" is only a verb: "Close the valve."</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+</section>
+
+<section class="wide" id="check">
+  <div class="col">
+    <h2>Check your text</h2>
+    <p>Paste text into the box. The tool counts the words in each sentence. It also finds some patterns that STE does not permit.</p>
+  </div>
+  <div class="panel">
+    <div class="row" style="margin-bottom:.8rem">
+      <span class="seg" role="radiogroup" aria-label="Text type">
+        <input type="radio" name="mode" id="mode20" value="20" checked><label for="mode20">Instructions: 20 words</label>
+        <input type="radio" name="mode" id="mode25" value="25"><label for="mode25">Description: 25 words</label>
+      </span>
+      <button class="btn" id="loadSample">Load the sample</button>
+    </div>
+    <label for="checkText" class="eyebrow">Your text</label>
+    <textarea id="checkText" spellcheck="false"></textarea>
+    <div class="summary" id="checkSummary" aria-live="polite"></div>
+    <div id="checkOut"></div>
+  </div>
+  <div class="col">
+    <div class="notice note"><b>NOTE</b><div><p>This tool is a simple check of eight patterns. It does not prove that a text obeys ASD-STE100. The full standard has 53 rules and a dictionary.</p></div></div>
+  </div>
+</section>
+
+<section class="wide" id="eighty">
+  <div class="col">
+    <h2>Why 80%, not 100%</h2>
+    <p>Karpathy asks for "80% of the way to ASD-STE100". The full standard is very strict. Its dictionary has no words for most software ideas. If you ask for the full standard, the model can remove a technical term and the fact that goes with it.</p>
+  </div>
+  <div class="panel">
+    <div class="eyebrow">Facts lost when Claude explained code, compared with no style instruction</div>
+    <div class="chart" role="img" aria-label="Facts lost: 8.5 percent with the prompt Simple Technical English, 46.8 percent with the prompt ASD-STE100">
+      <div class="cbar"><span>Prompt: "Simple Technical English"</span><div class="track"><div class="fill" style="width:8.5%"></div><span class="val" style="left:8.5%">8.5%</span></div></div>
+      <div class="cbar"><span>Prompt: "ASD-STE100" (full)</span><div class="track"><div class="fill over" style="width:46.8%"></div><span class="val" style="left:46.8%">46.8%</span></div></div>
+    </div>
+    <figcaption>Source: an informal test by Lucian Ghinda. Four code samples, six facts for each sample. Sentences became shorter in the two conditions: 17.8 words became 9.1 and 10.2.</figcaption>
+  </div>
+  <div class="col">
+    <p>A second test used plain prose with few technical terms. In that test the full standard lost no facts. The conclusion: the risk comes from technical terms.</p>
+    <h3>An example of a lost fact</h3>
+    <div class="pair">
+      <div><span class="tag">Normal answer</span><p>The function debounces the resize handler by 200 ms.</p></div>
+      <div class="no"><span class="tag">Too strict</span><p>The function waits before it does the work again.</p></div>
+    </div>
+    <p style="font-size:.9rem;color:var(--muted)">This example was written for this page. The strict version lost the term "debounce" and the value "200 ms".</p>
+    <div class="notice"><b>CAUTION</b><div><p>STE makes sentences shorter. It does not make answers shorter. In the second test, the answers had the same total length.</p><p>Always add this line: "Keep product names, code names and technical terms as they are."</p></div></div>
+  </div>
+</section>
+
+<section class="wide" id="decide">
+  <div class="col">
+    <h2>When to use it</h2>
+    <p>STE helps with text that you use for reference. It hurts text that must sound like a person. Answer the questions to get a recommendation.</p>
+  </div>
+  <div class="panel" id="flow" aria-live="polite"></div>
+  <div class="col">
+    <div class="scroll"><table style="margin-top:1.5rem">
+      <thead><tr><th>STE helps</th><th>STE hurts</th></tr></thead>
+      <tbody>
+        <tr><td>Long explanations become easy to scan.</td><td>Introductions and stories read like a parts list.</td></tr>
+        <tr><td>One word keeps one meaning.</td><td>The full standard can remove technical terms.</td></tr>
+        <tr><td>One line in a prompt is sufficient.</td><td>The answer does not become shorter.</td></tr>
+        <tr><td>Error messages and instructions become clear.</td><td>Your personal voice becomes flat.</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+</section>
+
+<section class="col" id="recipes">
+  <h2>Prompts you can copy</h2>
+  <p>Replace <code>[topic]</code> with your subject.</p>
+  <div id="recipeList"></div>
+
+  <h3>Where the technique sits in Karpathy's four formats</h3>
+  <figure class="scroll">
+    <svg viewBox="0 0 720 250" style="min-width:34rem" role="img" aria-label="Four output formats as rising steps: writing in STE, then a diagram, then a web page, then a video. Each step is easier to understand and harder to check.">
+      <defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker></defs>
+      <g fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M20 210H190V165H360V120H530V75H700"/>
+        <path d="M20 232H690" marker-end="url(#ah)"/>
+      </g>
+      <rect x="20" y="210" width="170" height="8" fill="var(--blue)"/>
+      <g font-size="15" font-weight="700">
+        <text x="30" y="200">1. Writing in STE</text>
+        <text x="200" y="155">2. Diagram</text>
+        <text x="370" y="110">3. Web page</text>
+        <text x="540" y="65">4. Video</text>
+      </g>
+      <g font-size="12" fill="var(--muted)">
+        <text x="30" y="182" style="fill:var(--muted)">You read sentences.</text>
+        <text x="200" y="137" style="fill:var(--muted)">You see the structure.</text>
+        <text x="370" y="92" style="fill:var(--muted)">You change a value.</text>
+        <text x="540" y="47" style="fill:var(--muted)">You watch the idea move.</text>
+        <text x="355" y="247" text-anchor="middle" style="fill:var(--muted)">More effort to make. Easier to understand. Harder to check.</text>
+      </g>
+    </svg>
+    <figcaption>STE prompting is the first step. It costs the least. You can also search and quote its output, which helps you check it.</figcaption>
+  </figure>
+
+  <h3>Where to put the rule</h3>
+  <div class="scroll"><table>
+    <thead><tr><th>Location</th><th>Use it when</th></tr></thead>
+    <tbody>
+      <tr><td>One line in your prompt</td><td>You want one answer in STE.</td></tr>
+      <tr><td><code>CLAUDE.md</code> or <code>AGENTS.md</code></td><td>You want STE for all explanations in a coding project.</td></tr>
+      <tr><td>A custom style in the Claude app</td><td>You want STE in your chats.</td></tr>
+      <tr><td>A skill with a linter</td><td>You rewrite one specific text and you want a real check.</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section class="col" id="verify">
+  <h2>Limits of the technique</h2>
+  <p>A prompt is a request. It is not a guarantee. The model can write text that looks like STE and still breaks the rules.</p>
+  <figure class="scroll">
+    <svg viewBox="0 0 720 210" style="min-width:34rem" role="img" aria-label="Your question and the STE line go to the model. The model returns an answer in STE style. The model does not check its own answer. A linter and a check of one fact against the source are outside the model.">
+      <g fill="none" stroke="currentColor" stroke-width="1.5">
+        <rect x="10" y="20" width="150" height="46"/><rect x="10" y="84" width="150" height="46"/>
+        <rect x="250" y="52" width="130" height="46"/>
+        <rect x="500" y="52" width="150" height="46"/>
+        <path d="M160 43H205V68H248" marker-end="url(#ah)"/><path d="M160 107H205V82H248" marker-end="url(#ah)"/>
+        <path d="M380 75H498" marker-end="url(#ah)"/>
+        <path d="M575 98V150" marker-end="url(#ah)" stroke-dasharray="5 4"/>
+      </g>
+      <rect x="460" y="152" width="230" height="46" fill="none" stroke="var(--blue)" stroke-width="2.5"/>
+      <g font-size="13.5" text-anchor="middle">
+        <text x="85" y="48">Your question</text><text x="85" y="112">The STE line</text>
+        <text x="315" y="80" font-weight="700">Model</text>
+        <text x="575" y="80">Answer in STE style</text>
+        <text x="575" y="172" font-weight="700">Your check</text><text x="575" y="189" font-size="12">a linter, and one fact against the source</text>
+      </g>
+      <g font-size="11.5" style="fill:var(--muted)">
+        <text x="439" y="68" text-anchor="middle" style="fill:var(--muted)">a request,</text>
+        <text x="439" y="92" text-anchor="middle" style="fill:var(--muted)">not a guarantee</text>
+        <text x="586" y="128" style="fill:var(--muted)">outside the model</text>
+      </g>
+    </svg>
+    <figcaption>The check must be outside the model. Models think that they obey a rule more often than they do.</figcaption>
+  </figure>
+
+  <h3>Two errors in a popular cheat sheet</h3>
+  <p>A one-page summary of the standard was shared with Karpathy's post. A review found errors in it. The page looked clear and correct, and it was still incorrect in these rows.</p>
+  <div class="scroll"><table>
+    <thead><tr><th>The cheat sheet says</th><th>The standard says</th></tr></thead>
+    <tbody>
+      <tr><td>Do not write "approximately". Write "about".</td><td>"Approximately" is approved. "About" is approved only with the meaning "concerned with".</td></tr>
+      <tr><td>"Test" is an approved verb.</td><td>"Test" is approved only as a noun: "Do a test of the circuit."</td></tr>
+    </tbody>
+  </table></div>
+  <div class="notice"><b>CAUTION</b><div><p>A clear answer can be incorrect. Before you use an answer, check one important fact against the original source.</p></div></div>
+
+  <footer>
+    <p><b>Sources.</b>
+    <a href="https://x.com/karpathy/status/2105819303471976479">Karpathy's post, 2 October 2026</a> ·
+    <a href="https://www.asd-ste100.org/">ASD-STE100 official site</a> ·
+    <a href="https://max.nardit.com/articles/karpathy-understanding-llm-outputs">Max Nardit: review of the post and the cheat sheet</a> ·
+    <a href="https://stashbase.ai/blog/asd-ste100-claude/">StashBase: tests of 80% and the full standard</a> ·
+    <a href="https://allaboutcoding.ghinda.com/explain-to-me-in-simple-technical-english/">Lucian Ghinda: code explanation test</a> ·
+    <a href="https://github.com/danyuchn/asd-ste100-skill">danyuchn/asd-ste100-skill</a></p>
+    <p>This page explains the technique. It is not an ASD publication. For certified documents, use the official standard.</p>
+  </footer>
+</section>
+</main>
+
+<script>
+(function(){
+const $=id=>document.getElementById(id);
+const esc=s=>s.replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+const words=s=>(s.trim().match(/[A-Za-z0-9'’%-]+/g)||[]).length;
+const sentences=t=>(t.replace(/\s+/g,' ').match(/[^.!?]+[.!?]+|[^.!?]+$/g)||[]).map(s=>s.trim()).filter(Boolean);
+
+/* ---------- rewriter ---------- */
+const stages=[
+ {t:'The original sentence',w:'One sentence holds three instructions. It has filler words, formal words and passive voice.',
+  h:'It is important to note that, prior to commencing the deployment, the configuration file should be verified by the engineer in order to ensure that the database connection has been established and that the cache has been cleared.'},
+ {t:'Rule: remove words that say nothing',w:'The first six words give no information. Delete them.',
+  h:'<del>It is important to note that,</del> prior to commencing the deployment, the configuration file should be verified by the engineer in order to ensure that the database connection has been established and that the cache has been cleared.'},
+ {t:'Rule: use the plain word',w:'Replace each formal word with the common word. Use that word every time.',
+  h:'<mark>Before</mark> you <mark>start</mark> the deployment, the configuration file should be <mark>checked</mark> by the engineer <mark>to make sure</mark> that the database connection has been established and that the cache has been cleared.'},
+ {t:'Rule: use the active voice',w:'Say who does the work. An instruction starts with the verb.',
+  h:'Before you start the deployment, <mark>check the configuration file</mark> to make sure that the database connection has been established and that the cache has been cleared.'},
+ {t:'Rule: use simple tenses',w:'"Has been established" becomes "is active". The meaning must stay the same.',
+  h:'Before you start the deployment, check the configuration file to make sure that the database connection <mark>is active</mark> and that the cache <mark>is empty</mark>.'},
+ {t:'Rule: one instruction in each sentence',w:'Three instructions become three sentences. Each sentence is below the limit.',
+  h:'<mark>Check the configuration file before you start the deployment.</mark> <mark>Make sure that the database connection is active.</mark> <mark>Make sure that the cache is empty.</mark>'}
+];
+let si=0;
+const dots=$('stepDots');
+stages.forEach((s,i)=>{const b=document.createElement('button');b.setAttribute('aria-label','Step '+(i+1)+': '+s.t);b.onclick=()=>{si=i;drawStage()};dots.appendChild(b)});
+function drawStage(){
+  const s=stages[si];
+  $('stageTitle').textContent=s.t; $('stageWhy').textContent=s.w; $('stageText').innerHTML=s.h;
+  const plain=s.h.replace(/<del>.*?<\/del>/g,'').replace(/<[^>]+>/g,'');
+  $('stageBars').innerHTML=sentences(plain).map((x,i)=>{const n=words(x);return `<div class="bar"><span>S${i+1}: ${n} words</span><div class="track"><div class="fill ${n>20?'over':''}" style="width:${Math.min(100,n/40*100)}%"></div><div class="limit" style="left:50%"></div></div></div>`}).join('');
+  [...dots.children].forEach((b,i)=>{b.setAttribute('aria-current',i===si);b.className=i<si?'done':''});
+  $('prevStep').disabled=si===0; $('nextStep').textContent=si===stages.length-1?'Start again':'Next rule';
+}
+$('prevStep').onclick=()=>{if(si>0){si--;drawStage()}};
+$('nextStep').onclick=()=>{si=si===stages.length-1?0:si+1;drawStage()};
+drawStage();
+
+/* ---------- rules ---------- */
+const rules=[
+ ['Short sentences','An instruction has a maximum of 20 words. A description has a maximum of 25 words.','When the upload process fails because of a timeout that occurs on the server, the client will try the upload again three times before it shows an error message to the user.','The server can cause a timeout. Then the client tries the upload again three times. If the upload fails again, the client shows an error message.'],
+ ['One instruction','Each sentence gives one instruction. The reader does one thing, then reads the next sentence.','Open the settings, select the API tab and copy the key.','Open the settings. Select the API tab. Copy the key.'],
+ ['Active voice','Say who does the action. Use the passive only in a description, when you do not know who does the action.','The file is deleted by the script after the backup has been made.','The script makes the backup. Then the script deletes the file.'],
+ ['Simple tenses','Use the command form, the simple present, the simple past and the simple future. Do not use "is doing" or "has done".','The server has been receiving the requests.','The server receives the requests.'],
+ ['One word, one meaning','Give each thing one name. Use that name every time. Do not change to a different word for variety.','Start the worker. When the agent is ready, send the job to the executor.','Start the worker. When the worker is ready, send the job to the worker.'],
+ ['Verb, not noun','Use the verb for an action. A noun made from a verb makes the sentence long and hides who does the action.','Perform an analysis of the log.','Analyze the log.'],
+ ['Short multi-word nouns','Put a maximum of three words together as one noun.','the user account password reset email template','the email template for a password reset'],
+ ['No semicolons','The standard does not permit the semicolon. Write two sentences.','The cache is full; the service stops.','The cache is full. The service stops.'],
+ ['Keep small words','Do not remove "the", "a" or "this" to make a sentence shorter. The reader needs these words.','Check log, restart service.','Check the log. Restart the service.']
+];
+const tabs=$('ruleTabs');
+rules.forEach((r,i)=>{const b=document.createElement('button');b.textContent=r[0];b.setAttribute('role','tab');b.onclick=()=>drawRule(i);tabs.appendChild(b)});
+function drawRule(i){const r=rules[i];$('ruleTitle').textContent=r[0];$('ruleText').textContent=r[1];$('ruleNo').textContent=r[2];$('ruleYes').textContent=r[3];[...tabs.children].forEach((b,j)=>b.setAttribute('aria-selected',j===i))}
+drawRule(0);
+
+/* ---------- checker ---------- */
+const SAMPLE='It is important to note that the service has been restarted by the scheduler; the logs are being written to a new file. Prior to commencing the upgrade, you should utilize the backup tool in order to ensure that all of the customer records from the last thirty days are copied to the second storage location. Restart the worker. Check the queue length.';
+const checks=[
+ ['Semicolon',/;/g],
+ ['Filler phrase',/\b(it is important to note that|it should be noted that|please note that|in order to|basically|essentially)\b/gi],
+ ['Formal word',/\b(utili[sz]e[sd]?|utili[sz]ing|commenc(?:e|es|ed|ing)|prior to|ensur(?:e|es|ed|ing)|replenish(?:es|ed|ing)?|subsequently|facilitat(?:e|es|ed|ing)|leverag(?:e|es|ed|ing))\b/gi],
+ ['Perfect tense',/\b(has|have|had)\s+(?:not\s+)?(?:been\s+)?\w+(?:ed|en)\b/gi],
+ ['Progressive (-ing) verb',/\b(is|are|was|were|am)\s+(?:not\s+)?(?:being\s+)?\w+ing\b/gi],
+ ['Passive voice',/\b(is|are|was|were|be|been|being)\s+(?:not\s+)?(?:\w+ed|made|done|given|taken|shown|written|sent|built|found|kept|set|run)\b/gi],
+ ['Phrasal verb',/\b(spin(?:s|ning)? up|kick(?:s|ed|ing)? off|reach(?:es|ed|ing)? out|dive(?:s|d)? into|circle(?:s|d)? back)\b/gi]
+];
+function runCheck(){
+  const lim=+document.querySelector('input[name=mode]:checked').value;
+  const txt=$('checkText').value, ss=sentences(txt);
+  let bad=0, out='';
+  ss.forEach((s,i)=>{
+    const n=words(s), flags=[], ranges=[];
+    if(n>lim)flags.push(`${n} words, limit ${lim}`);
+    checks.forEach(([name,re])=>{re.lastIndex=0;let m,hit=false;while((m=re.exec(s))){ranges.push([m.index,m.index+m[0].length]);hit=true;if(!m[0].length)re.lastIndex++}if(hit)flags.push(name)});
+    ranges.sort((a,b)=>a[0]-b[0]);
+    const merged=[];ranges.forEach(r=>{const l=merged[merged.length-1];if(l&&r[0]<=l[1])l[1]=Math.max(l[1],r[1]);else merged.push([r[0],r[1]])});
+    let h='',p=0;merged.forEach(([a,b])=>{h+=esc(s.slice(p,a))+'<span class="hit">'+esc(s.slice(a,b))+'</span>';p=b});h+=esc(s.slice(p));
+    if(flags.length)bad++;
+    out+=`<div class="sent"><p>${h}</p><div class="bar"><span>${n} words</span><div class="track"><div class="fill ${n>lim?'over':''}" style="width:${Math.min(100,n/50*100)}%"></div><div class="limit" style="left:${lim/50*100}%"></div></div></div><div class="chips">${flags.length?flags.map(f=>`<span class="chip">${esc(f)}</span>`).join(''):'<span class="chip ok">No findings</span>'}</div></div>`;
+  });
+  $('checkOut').innerHTML=out;
+  $('checkSummary').textContent=ss.length?`${ss.length} sentences. ${bad} with findings. ${ss.length-bad} without findings.`+(ss.length>6?' A paragraph has a maximum of 6 sentences.':''):'Type or paste text to start the check.';
+}
+$('checkText').value=SAMPLE;
+$('checkText').addEventListener('input',runCheck);
+document.querySelectorAll('input[name=mode]').forEach(r=>r.addEventListener('change',runCheck));
+$('loadSample').onclick=()=>{$('checkText').value=SAMPLE;runCheck()};
+runCheck();
+
+/* ---------- decision flow ---------- */
+const P_BASE='Explain [topic]. Write 80% of the way to ASD-STE100.';
+const P_KEEP=P_BASE+' Keep product names, code names and technical terms as they are.';
+const flow={
+ start:{q:'What type of text do you want?',o:[
+   ['An explanation, a summary or an answer that I read','terms'],
+   ['Instructions, an error message or reference text','terms'],
+   ['Text that a different AI agent reads (a tool description, a system prompt)','strict'],
+   ['An introduction, a story, marketing text or personal writing','no']]},
+ terms:{q:'Does the subject have many technical terms, code names or product names?',o:[['Yes','whereK'],['No','where']]},
+ where:{q:'How frequently do you want this style?',o:[['For one answer','r1'],['For all explanations in a project','r2']]},
+ whereK:{q:'How frequently do you want this style?',o:[['For one answer','r1k'],['For all explanations in a project','r2']]},
+ r1:{v:'Use 80% STE',c:'go',d:'Add one line to your prompt.',p:P_BASE},
+ r1k:{v:'Use 80% STE and keep the terms',c:'go',d:'The second sentence prevents the loss of facts.',p:P_KEEP},
+ r2:{v:'Put the rule in your project file',c:'go',d:'Add this rule to CLAUDE.md or AGENTS.md. The second line keeps STE out of text that must sound like you.',p:'- When you explain something to me, write 80% of the way to ASD-STE100: one idea per sentence, short sentences, active voice, one word for one meaning. Keep product names, code names and technical terms as they are.\n- When you write text for publication, do not use STE. Use a natural voice.'},
+ strict:{v:'Use strict STE and a linter',c:'go',d:'An agent cannot ask you a question. Wrong reading has a cost. Apply all the rules, then check the text with a linter.',p:'Rewrite the text below in ASD-STE100. Use one instruction in each sentence and the active voice. Do not remove a fact, a condition or a number. Do not make an uncertain statement certain.\n\n[text]'},
+ no:{v:'Do not use STE',c:'stop',d:'STE removes the connections between ideas. It also makes your voice flat. Ask for a natural voice with different sentence lengths.',p:''}
+};
+let path=[],node='start';
+function drawFlow(){
+  const n=flow[node], el=$('flow');
+  let h='<div class="crumbs">'+(path.length?path.map(p=>`<span>${esc(p)}</span>`).join(''):'<span>Start</span>')+'</div>';
+  if(n.q){h+=`<div class="q">${esc(n.q)}</div><div class="opts">`+n.o.map((o,i)=>`<button data-i="${i}">${esc(o[0])}</button>`).join('')+'</div>'}
+  else{h+=`<div class="verdict ${n.c}">${esc(n.v)}</div><p>${esc(n.d)}</p>`+(n.p?recipeHTML('Prompt for this case',n.p,''):'')}
+  if(path.length)h+='<div class="row" style="margin-top:1rem"><button class="btn" id="flowReset">Start again</button></div>';
+  el.innerHTML=h;
+  el.querySelectorAll('.opts button').forEach(b=>b.onclick=()=>{const o=n.o[+b.dataset.i];path.push(o[0].length>44?o[0].slice(0,42)+'…':o[0]);node=o[1];drawFlow()});
+  const r=$('flowReset');if(r)r.onclick=()=>{path=[];node='start';drawFlow()};
+  bindCopy(el);
+}
+
+/* ---------- recipes ---------- */
+function recipeHTML(title,text,note){return `<div class="recipe"><header><h3>${esc(title)}</h3><button class="copy">Copy</button></header><pre>${esc(text)}</pre>${note?`<p>${esc(note)}</p>`:''}</div>`}
+function bindCopy(root){root.querySelectorAll('.copy').forEach(b=>b.onclick=()=>{
+  const pre=b.closest('.recipe').querySelector('pre');
+  const done=()=>{b.textContent='Copied';setTimeout(()=>b.textContent='Copy',1500)};
+  const sel=()=>{const r=document.createRange();r.selectNodeContents(pre);const s=getSelection();s.removeAllRanges();s.addRange(r);b.textContent='Selected. Copy it.'};
+  try{navigator.clipboard.writeText(pre.textContent).then(done,sel)}catch(e){sel()}})}
+const recipes=[
+ ['The basic prompt',P_BASE,'This is the prompt from Karpathy\'s post.'],
+ ['The safe prompt','Explain [topic]. Write 80% of the way to ASD-STE100 Simplified Technical English: one idea per sentence, short sentences, active voice, one word for one meaning. Keep product names, code names and technical terms as they are. Keep each "if", "unless" and "may".','Use this prompt for code and other technical subjects.'],
+ ['Rewrite a text that you have','Rewrite the text below 80% of the way to ASD-STE100. Do not remove a fact, a condition or a number. Do not make an uncertain statement certain. After the text, list each phrase that you kept long, and give the reason.\n\n[text]','The last sentence makes the model show the places where it did not simplify.'],
+ ['STE and a diagram together','Explain [topic] 80% of the way to ASD-STE100. Then make a Mermaid diagram of the same idea. Below the diagram, write one sentence for each arrow.','This prompt joins the first two steps of Karpathy\'s list. The sentences let you check each arrow.']
+];
+$('recipeList').innerHTML=recipes.map(r=>recipeHTML(...r)).join('');
+bindCopy($('recipeList'));
+drawFlow();
+
+/* ---------- video (shown only when the file is published) ---------- */
+const hideVideo=()=>{$('video').hidden=true;const a=document.querySelector('nav.toc a[href="#video"]');if(a)a.hidden=true};
+$('vid').addEventListener('error',hideVideo);
+$('vid').src='ste100-explainer.mp4';$('video').hidden=false;
+})();
+</script>
+
+</body>
+</html>

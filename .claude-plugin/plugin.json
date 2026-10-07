@@ -1,0 +1,10 @@
+{
+  "name": "ste-explain",
+  "description": "Clear answers in 80% ASD-STE100 Simplified Technical English: short sentences, plain words, one idea per sentence. Also explains as a labelled diagram, an interactive HTML page or a silent Manim video, and includes a checker for lost facts.",
+  "version": "1.1.0",
+  "author": {
+    "name": "Akash Parashar"
+  },
+  "license": "MIT",
+  "keywords": ["writing", "ste", "asd-ste100", "simplified-technical-english", "explain", "clarity", "documentation"]
+}

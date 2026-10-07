@@ -1,0 +1,99 @@
+{
+  "skill_name": "ste-explain",
+  "evals": [
+    {
+      "id": 1,
+      "name": "explain-technical-topic",
+      "prompt": "Explain how a database index speeds up a query. Use STE.",
+      "expected_output": "A short explanation in 80% STE that keeps the technical terms (index, B-tree or similar, query) and does not mention the rules.",
+      "files": [],
+      "assertions": [
+        "No sentence has more than 25 words",
+        "The answer contains no semicolon",
+        "The answer does not mention ASD-STE100, STE or 'the rules'",
+        "The word 'index' is used for the index every time, with no synonym such as 'lookup table' used as a second name",
+        "scripts/ste_check.py reports 0 hard findings on the answer"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "rewrite-keeps-facts",
+      "prompt": "Rewrite this so that nobody can misread it:\n\nIt should be noted that the `retry_backoff_ms` parameter, which defaults to 250, will be doubled after each failed attempt up to a maximum of 8000, unless `jitter` has been enabled, in which case a random delay of up to 20% may additionally be applied.",
+      "expected_output": "Only the rewritten text, in short active sentences, with every identifier, number, condition and hedge kept.",
+      "files": [],
+      "assertions": [
+        "The rewrite contains `retry_backoff_ms`, 250, 8000, `jitter` and 20%",
+        "The rewrite keeps the condition on jitter (if or unless)",
+        "The rewrite keeps the uncertainty of the random delay (may or can), and does not state it as certain",
+        "The output has no preamble such as 'Here is the rewritten text'",
+        "scripts/ste_check.py --compare reports 0 lost-fact findings"
+      ]
+    },
+    {
+      "id": 3,
+      "name": "diagram-with-arrow-sentences",
+      "prompt": "Explain the OAuth authorization code flow as a diagram.",
+      "expected_output": "A Mermaid diagram with a verb label on every arrow, followed by one numbered sentence for each arrow.",
+      "files": [],
+      "assertions": [
+        "The answer contains a fenced mermaid code block",
+        "Every arrow in the diagram has a label",
+        "The number of sentences in the list below the diagram equals the number of arrows",
+        "The diagram has 12 nodes or fewer"
+      ]
+    },
+    {
+      "id": 4,
+      "name": "does-not-apply-to-creative-writing",
+      "prompt": "Write a warm two-paragraph welcome note for new members of our book club.",
+      "expected_output": "A natural, warm note. The skill should not trigger, or if consulted should decline to apply STE.",
+      "files": [],
+      "assertions": [
+        "The note uses a natural voice with varied sentence length",
+        "The note is not written as numbered steps or parts-list sentences"
+      ]
+    },
+    {
+      "id": 5,
+      "name": "topic-only-triggers-research",
+      "prompt": "How do vaccines train the immune system?",
+      "expected_output": "The assistant searches the web first, then gives a short STE-style explanation with bracketed source numbers and a numbered Sources list.",
+      "files": [],
+      "assertions": [
+        "The assistant ran at least 3 web searches before it answered",
+        "The answer ends with a numbered Sources list with a full URL for each source",
+        "Each URL in the list is one that the assistant opened during the session (no invented links)",
+        "Key claims have a bracketed source number",
+        "If two sources disagree, the answer says so",
+        "No sentence has more than 25 words"
+      ]
+    },
+    {
+      "id": 6,
+      "name": "page-has-animation-and-sources",
+      "prompt": "Make an interactive page that explains how a CDN cache works.",
+      "expected_output": "One HTML file with research, an animated diagram with a Pause button, a control, an Assumptions section and a Sources section with real links.",
+      "files": [],
+      "assertions": [
+        "The HTML contains an inline SVG that changes over time",
+        "The page has a button that pauses and plays the animation",
+        "The animation stops at start when prefers-reduced-motion is set",
+        "A slider or toggle changes the animation, not only a number",
+        "The page has a Sources section where each item is a link with target=_blank and rel=noopener",
+        "The page has a visible Assumptions section"
+      ]
+    },
+    {
+      "id": 7,
+      "name": "no-web-tools-no-fake-sources",
+      "prompt": "Explain how TCP slow start works. (Run with web tools turned off.)",
+      "expected_output": "An explanation that says in one sentence that the facts are not checked, and has no source links.",
+      "files": [],
+      "assertions": [
+        "The answer says that the facts were not checked against a source",
+        "The answer contains no URL",
+        "The answer contains no Sources list"
+      ]
+    }
+  ]
+}

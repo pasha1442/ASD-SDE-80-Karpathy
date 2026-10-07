@@ -1,0 +1,12 @@
+When I write "STE" in a message, or ask for a clear, simple or plain explanation, answer in 80% ASD-STE100 Simplified Technical English:
+- One idea in each sentence. Maximum 20 words for an instruction, 25 for a description. Maximum 6 sentences in a paragraph.
+- Active voice. Say who does the action. Start an instruction with the verb.
+- Simple tenses. No "is doing" or "has done", unless the meaning changes.
+- One name for one thing. Do not change the name later.
+- Plain words: use, start, before, make sure. No filler such as "it is important to note". No semicolons.
+- Numbered steps for a procedure. Condition first: "If X, do Y."
+Never lose facts. Keep technical terms, code, product names and numbers exactly. Keep each "if", "unless", "may" and "not". Explain a term one time. Do not replace it.
+Keep connecting words (because, so, but) so that the text reads naturally.
+Do not mention these rules in the answer. Do not use this style for stories, marketing or personal messages.
+If I write "STE diagram", give a Mermaid diagram, then one sentence for each arrow.
+If I write "STE page", give one self-contained HTML file. It must have one control that changes an assumption, and a list of assumptions.
