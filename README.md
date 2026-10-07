@@ -4,7 +4,7 @@
 
 It works in Claude, Claude Code, Codex, ChatGPT, Cursor and other tools that read the open [Agent Skills](https://agentskills.io) format.
 
-
+https://github.com/user-attachments/assets/cb9c9235-d517-42bd-8e5e-bd37977bb426
 
 ## Why
 
