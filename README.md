@@ -1,6 +1,6 @@
-# STE Explain
+# ASD-SDE-80-Karpathy
 
-**Clear AI answers in one step.** STE Explain is an agent skill that makes your AI assistant write like an aircraft maintenance manual: short sentences, plain words, one idea in each sentence. It can also research a topic on the web first, and then give the explanation as a diagram, an interactive page with animated diagrams and source links, or a silent video.
+**Clear AI answers in one step.** ASD-SDE-80-Karpathy Explain is an agent skill that makes your AI assistant write like an aircraft maintenance manual: short sentences, plain words, one idea in each sentence. It can also research a topic on the web first, and then give the explanation as a diagram, an interactive page with animated diagrams and source links, or a silent video.
 
 It works in Claude, Claude Code, Codex, ChatGPT, Cursor and other tools that read the open [Agent Skills](https://agentskills.io) format.
 
